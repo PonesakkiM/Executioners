@@ -1,0 +1,13 @@
+employee_id,first_name,last_name,department,salary,email,hire_date,status
+EMP001,John,Smith,Engineering,95000,john.smith@company.com,2019-03-15,Active
+EMP002,Sarah,Johnson,Marketing,72000,sarah.j@company.com,2020-07-22,Active
+EMP003,Michael,Chen,Finance,88000,m.chen@company.com,2018-11-01,Active
+EMP004,Emily,Davis,HR,65000,emily.davis@company.com,2021-02-10,Active
+EMP005,Robert,Wilson,Engineering,102000,r.wilson@company.com,2017-06-30,Active
+EMP006,Lisa,Anderson,Sales,78000,l.anderson@company.com,2020-01-15,Active
+EMP007,David,Martinez,Engineering,97000,d.martinez@company.com,2019-09-05,Active
+EMP008,Jennifer,Taylor,Finance,84000,j.taylor@company.com,2018-04-20,Active
+EMP009,James,Brown,Marketing,69000,j.brown@company.com,2022-03-01,Active
+EMP010,Amanda,White,Sales,75000,a.white@company.com,2021-08-14,Active
+EMP011,Christopher,Lee,Engineering,110000,c.lee@company.com,2016-12-01,Active
+EMP012,Michelle,Harris,HR,62000,m.harris@company.com,2022-06-20,Active

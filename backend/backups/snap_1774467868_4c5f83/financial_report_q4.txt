@@ -1,0 +1,39 @@
+CONFIDENTIAL — Q4 2025 FINANCIAL REPORT
+=======================================
+Company: SentinelShield Technologies Inc.
+Period: October 1 – December 31, 2025
+Prepared by: Finance Department
+
+REVENUE SUMMARY
+---------------
+Product Licenses:     $4,250,000
+SaaS Subscriptions:   $2,180,000
+Professional Services:  $890,000
+Support Contracts:      $420,000
+                      -----------
+Total Revenue:        $7,740,000
+
+OPERATING EXPENSES
+------------------
+Salaries & Benefits:  $3,200,000
+R&D Investment:       $1,100,000
+Sales & Marketing:      $780,000
+Infrastructure:         $340,000
+G&A:                    $290,000
+                      -----------
+Total OpEx:           $5,710,000
+
+NET OPERATING INCOME: $2,030,000
+Operating Margin:     26.2%
+
+KEY METRICS
+-----------
+New Customers:        142
+Churn Rate:           2.1%
+ARR Growth:           34%
+NPS Score:            72
+
+NOTES
+-----
+Q4 exceeded targets by 12%. Strong enterprise sales pipeline
+heading into 2026. Board approval required for Q1 expansion budget.

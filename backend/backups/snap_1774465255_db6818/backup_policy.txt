@@ -1,0 +1,37 @@
+BACKUP & RECOVERY POLICY
+========================
+Version: 3.2 | Approved: 2025-11-01
+Owner: IT Operations
+
+BACKUP SCHEDULE
+---------------
+Full Backup:        Every Sunday 02:00 AM
+Incremental:        Daily Mon-Sat 02:00 AM
+Snapshot (SentinelShield): Every 30 minutes (automated)
+
+RETENTION POLICY
+----------------
+Daily backups:      30 days
+Weekly backups:     12 weeks
+Monthly backups:    12 months
+Snapshots:          72 hours rolling
+
+RECOVERY OBJECTIVES
+-------------------
+RTO (Recovery Time Objective):   4 hours
+RPO (Recovery Point Objective):  30 minutes
+
+STORAGE LOCATIONS
+-----------------
+Primary:    /app/backups (local NVMe — immutable)
+Secondary:  Azure Blob Storage (geo-redundant)
+Offsite:    Physical tape — monthly rotation
+
+RANSOMWARE RESPONSE PROCEDURE
+------------------------------
+1. SentinelShield detects canary file access
+2. Automatic snapshot triggered immediately
+3. Infected files quarantined to /app/quarantine
+4. Restore from last clean snapshot
+5. Incident report filed within 2 hours
+6. Post-mortem within 48 hours

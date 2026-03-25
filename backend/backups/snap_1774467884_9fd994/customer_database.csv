@@ -1,0 +1,11 @@
+customer_id,company,contact,email,phone,contract_value,renewal_date,tier
+C001,Acme Corporation,Tom Bradley,t.bradley@acme.com,+1-555-0101,48000,2026-03-31,Enterprise
+C002,GlobalTech Ltd,Susan Park,s.park@globaltech.com,+1-555-0102,24000,2026-06-30,Business
+C003,Nexus Industries,Mark Rivera,m.rivera@nexus.com,+1-555-0103,96000,2026-01-15,Enterprise
+C004,Pinnacle Group,Anna Koch,a.koch@pinnacle.com,+1-555-0104,18000,2026-09-30,Starter
+C005,Vertex Systems,Paul Nguyen,p.nguyen@vertex.com,+1-555-0105,72000,2026-04-30,Business
+C006,Horizon Labs,Claire Moss,c.moss@horizon.com,+1-555-0106,36000,2026-07-31,Business
+C007,Apex Solutions,Derek Stone,d.stone@apex.com,+1-555-0107,120000,2026-02-28,Enterprise
+C008,Catalyst Corp,Nina Patel,n.patel@catalyst.com,+1-555-0108,15000,2026-11-30,Starter
+C009,Meridian Inc,Frank Yuen,f.yuen@meridian.com,+1-555-0109,54000,2026-05-31,Business
+C010,Quantum Dynamics,Lena Schulz,l.schulz@quantum.com,+1-555-0110,84000,2026-08-31,Enterprise

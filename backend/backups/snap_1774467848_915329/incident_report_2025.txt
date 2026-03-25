@@ -1,0 +1,49 @@
+SECURITY INCIDENT REPORT
+========================
+Incident ID:  INC-2025-0847
+Date:         2025-09-14
+Severity:     HIGH
+Status:       RESOLVED
+
+SUMMARY
+-------
+Phishing email delivered malicious macro-enabled document to
+3 employees in the Finance department. Macro attempted to
+download ransomware payload. SentinelShield AI detected
+behavioral anomaly within 4 seconds and blocked execution.
+
+TIMELINE
+--------
+09:14:32  Malicious email received by finance@company.com
+09:22:15  User opened attachment (macro enabled)
+09:22:19  Macro executed — attempted PowerShell download
+09:22:23  SentinelShield detected rapid file modification
+09:22:24  Canary file access detected — CRITICAL alert raised
+09:22:25  Process terminated automatically
+09:22:26  Affected files quarantined (3 files)
+09:22:28  Snapshot restore initiated
+09:22:45  Recovery complete — zero data loss
+
+AFFECTED SYSTEMS
+----------------
+- FIN-WS-003 (Finance workstation)
+- 3 files temporarily encrypted (recovered from snapshot)
+- No data exfiltration detected
+
+ROOT CAUSE
+----------
+User clicked "Enable Content" on unsolicited email attachment.
+Lack of MFA on finance workstations allowed initial access.
+
+REMEDIATION
+-----------
+[x] MFA enforced on all workstations
+[x] Email filtering rules updated
+[x] User awareness training completed
+[x] Canary files redeployed in all directories
+[ ] Penetration test scheduled for Q4 2025
+
+LESSONS LEARNED
+---------------
+SentinelShield canary detection prevented full encryption.
+Recovery time: 17 seconds. Zero data loss confirmed.
