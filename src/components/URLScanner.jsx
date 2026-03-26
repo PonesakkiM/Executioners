@@ -17,11 +17,22 @@ const verdictStyle = {
   INVALID:    { color: '#6b5a45', bg: 'rgba(107,90,69,0.08)',  border: 'rgba(107,90,69,0.2)',  icon: X, label: 'Invalid URL' },
 }
 
+const INITIAL_HISTORY = [
+  { url: 'http://microsoft-account-verify.top/login',    verdict: 'MALICIOUS',  risk_score: 95, time: '09:14:32', domain: 'microsoft-account-verify.top' },
+  { url: 'https://paypa1.com/secure/login',              verdict: 'MALICIOUS',  risk_score: 85, time: '09:22:10', domain: 'paypa1.com' },
+  { url: 'http://192.168.1.105/admin/login',             verdict: 'MALICIOUS',  risk_score: 75, time: '10:05:44', domain: '192.168.1.105' },
+  { url: 'https://google-security-alert.xyz/verify',     verdict: 'MALICIOUS',  risk_score: 90, time: '10:31:17', domain: 'google-security-alert.xyz' },
+  { url: 'https://bit.ly/3xR9mKp',                      verdict: 'SUSPICIOUS', risk_score: 45, time: '11:02:58', domain: 'bit.ly' },
+  { url: 'https://dropbox-share.online/file/report.pdf', verdict: 'SUSPICIOUS', risk_score: 55, time: '11:45:03', domain: 'dropbox-share.online' },
+  { url: 'https://microsoft.com',                        verdict: 'SAFE',       risk_score: 0,  time: '12:00:00', domain: 'microsoft.com' },
+  { url: 'https://google.com',                           verdict: 'SAFE',       risk_score: 0,  time: '12:01:15', domain: 'google.com' },
+]
+
 export default function URLScanner({ user }) {
   const [url, setUrl]         = useState('')
   const [result, setResult]   = useState(null)
   const [scanning, setScanning] = useState(false)
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState(INITIAL_HISTORY)
 
   const scan = async (urlToScan) => {
     const target = (urlToScan ?? url).trim()
