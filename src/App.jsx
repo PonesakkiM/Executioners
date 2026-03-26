@@ -10,15 +10,22 @@ import FileRecoveryPage   from './components/FileRecoveryPage'
 import SystemLogsPage     from './components/SystemLogsPage'
 import HumanDefensePanel  from './components/HumanDefensePanel'
 import SettingsPage       from './components/SettingsPage'
+import URLScanner         from './components/URLScanner'
 
 const pages = {
   dashboard:  Dashboard,
   threats:    ThreatActivityPage,
-  folders:    () => <div className="p-5 space-y-4"><p className="text-white font-semibold text-lg">Monitored Folders</p><MonitoredPathsPanel /></div>,
-  quarantine: () => <div className="p-5 space-y-4"><p className="text-white font-semibold text-lg">Quarantine</p><QuarantineViewer /></div>,
+  folders:    () => <div className="p-5 space-y-4"><p className="font-semibold text-lg" style={{ color: '#1a1a1a' }}>Monitored Folders</p><MonitoredPathsPanel /></div>,
+  quarantine: () => <div className="p-5 space-y-4"><p className="font-semibold text-lg" style={{ color: '#1a1a1a' }}>Quarantine</p><QuarantineViewer /></div>,
   backups:    FileRecoveryPage,
   logs:       SystemLogsPage,
-  awareness:  () => <div className="p-5 space-y-4"><p className="text-white font-semibold text-lg">Human Awareness</p><HumanDefensePanel /></div>,
+  awareness:  () => (
+    <div className="h-full overflow-y-auto p-5 space-y-4">
+      <p className="font-semibold text-lg" style={{ color: '#1a1a1a' }}>Human Awareness</p>
+      <URLScanner />
+      <HumanDefensePanel />
+    </div>
+  ),
   settings:   SettingsPage,
 }
 

@@ -15,8 +15,8 @@ export default function ThreatActivityPage() {
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto scrollbar-thin p-5 space-y-4">
-      <p className="text-white font-semibold text-lg">Threat Monitor</p>
+    <div className="h-full overflow-y-auto scrollbar-thin p-5 space-y-4" style={{ background: '#F5F5DC' }}>
+      <p className="font-semibold text-lg" style={{ color: '#1a1a1a' }}>Threat Monitor</p>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-2"><ThreatScoreGauge score={score} /></div>
         <div className="col-span-10 h-80"><LiveActivityFeed /></div>

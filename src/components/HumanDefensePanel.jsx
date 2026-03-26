@@ -9,17 +9,17 @@ const tips = [
 ]
 
 const levelStyle = {
-  tip:       { color: '#2F80ED', bg: 'rgba(47,128,237,0.06)',  border: 'rgba(47,128,237,0.15)' },
-  important: { color: '#00FFB2', bg: 'rgba(0,255,178,0.06)',   border: 'rgba(0,255,178,0.15)'  },
-  warning:   { color: '#F2C94C', bg: 'rgba(242,201,76,0.06)',  border: 'rgba(242,201,76,0.15)' },
+  tip:       { color: '#C2A68D', bg: '#F5F5DC',  border: '#D1BFA2' },
+  important: { color: '#2d6a4f', bg: '#d4edda',  border: '#a8d5b5' },
+  warning:   { color: '#b7770d', bg: '#fef3cd',  border: '#fde68a' },
 }
 
 export default function HumanDefensePanel() {
   return (
-    <div className="glass rounded-xl p-5">
+    <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
       <div className="flex items-center gap-2 mb-4">
-        <Users size={14} className="text-[#2F80ED]" />
-        <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Human Defense Layer</p>
+        <Users size={14} style={{ color: '#C2A68D' }} />
+        <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Human Defense Layer</p>
       </div>
       <div className="space-y-2">
         {tips.map((t, i) => {
@@ -28,10 +28,10 @@ export default function HumanDefensePanel() {
             <div
               key={i}
               className="flex items-start gap-3 px-3 py-2.5 rounded-lg transition-all hover:scale-[1.01]"
-              style={{ background: s.bg, border: `1px solid ${s.border}` }}
+              style={{ background: s.bg, border: `1px solid ${s.border}`, borderLeft: `3px solid ${s.color}` }}
             >
               <t.icon size={15} style={{ color: s.color }} className="mt-0.5 shrink-0" />
-              <p className="text-sm text-[#8ba0b8] leading-relaxed">{t.text}</p>
+              <p className="text-sm leading-relaxed" style={{ color: '#3d3020' }}>{t.text}</p>
             </div>
           )
         })}

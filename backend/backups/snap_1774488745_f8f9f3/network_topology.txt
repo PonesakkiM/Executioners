@@ -1,0 +1,36 @@
+NETWORK TOPOLOGY — INTERNAL INFRASTRUCTURE
+==========================================
+Last Updated: 2026-03-25
+Classification: INTERNAL USE ONLY
+
+CORE NETWORK SEGMENTS
+---------------------
+10.0.1.0/24   — Corporate HQ (48 endpoints)
+10.0.2.0/24   — Engineering Lab (12 servers)
+10.0.3.0/24   — Finance & HR (8 workstations)
+10.0.4.0/24   — DMZ / Public-facing services
+192.168.10.0/24 — Remote VPN pool
+
+KEY SERVERS
+-----------
+10.0.2.10   — Primary Domain Controller (DC01)
+10.0.2.11   — Backup Domain Controller (DC02)
+10.0.2.20   — File Server (FS01) — 12TB storage
+10.0.2.21   — Database Server (DB01) — PostgreSQL 15
+10.0.2.30   — Email Server (MAIL01) — Exchange 2019
+10.0.2.40   — Backup Server (BKP01) — Veeam
+10.0.4.10   — Web Server (WEB01) — nginx
+10.0.4.11   — API Gateway (API01)
+
+FIREWALL RULES (summary)
+------------------------
+ALLOW  10.0.1.0/24 → 10.0.2.0/24  (corporate to servers)
+ALLOW  10.0.1.0/24 → 443,80        (internet browsing)
+DENY   10.0.4.0/24 → 10.0.2.0/24  (DMZ cannot reach internal)
+DENY   ANY → 10.0.3.0/24           (finance isolated)
+
+MONITORING
+----------
+SentinelShield AI endpoints: 48 nodes
+Last full scan: 2026-03-25 18:00:00
+Threat level: LOW

@@ -1,6 +1,7 @@
 export default function ThreatScoreGauge({ score = 0 }) {
   const clamped = Math.min(Math.max(score, 0), 100)
-  const color   = clamped >= 70 ? '#FF3B3B' : clamped >= 30 ? '#F2C94C' : '#00FFB2'
+  const color   = clamped >= 70 ? '#c0392b' : clamped >= 30 ? '#b7770d' : '#2d6a4f'
+  const bgColor = clamped >= 70 ? '#fde8e6' : clamped >= 30 ? '#fef3cd' : '#d4edda'
   const label   = clamped >= 70 ? 'CRITICAL' : clamped >= 30 ? 'ELEVATED' : 'NORMAL'
 
   // SVG arc math
@@ -17,12 +18,12 @@ export default function ThreatScoreGauge({ score = 0 }) {
   }
 
   return (
-    <div className="glass rounded-xl p-5 flex flex-col items-center gap-3">
-      <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Threat Score</p>
+    <div className="rounded-xl p-5 flex flex-col items-center gap-3" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
+      <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Threat Score</p>
       <div className="relative w-32 h-32">
         <svg viewBox="0 0 128 128" className="w-full h-full">
           {/* Track */}
-          <path d={arcPath(startAngle, endAngle)} fill="none" stroke="#1a2d4a" strokeWidth="8" strokeLinecap="round" />
+          <path d={arcPath(startAngle, endAngle)} fill="none" stroke="#D1BFA2" strokeWidth="8" strokeLinecap="round" />
           {/* Fill */}
           <path
             d={arcPath(startAngle, startAngle + fillArc)}
@@ -30,34 +31,34 @@ export default function ThreatScoreGauge({ score = 0 }) {
             stroke={color}
             strokeWidth="8"
             strokeLinecap="round"
-            style={{ filter: `drop-shadow(0 0 6px ${color})`, transition: 'all 0.6s ease' }}
+            style={{ transition: 'all 0.6s ease' }}
           />
           {/* Zone markers */}
           {[30, 70].map((pct) => {
             const angle = startAngle + (pct / 100) * totalArc
             const ix = cx + (r + 10) * Math.cos(toRad(angle))
             const iy = cy + (r + 10) * Math.sin(toRad(angle))
-            return <circle key={pct} cx={ix} cy={iy} r="2" fill="#1a2d4a" />
+            return <circle key={pct} cx={ix} cy={iy} r="2" fill="#C2A68D" />
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold font-mono" style={{ color, textShadow: `0 0 15px ${color}80` }}>
+          <span className="text-3xl font-bold font-mono" style={{ color }}>
             {clamped}
           </span>
-          <span className="text-[#4a6080] text-xs">/ 100</span>
+          <span className="text-xs" style={{ color: '#6b5a45' }}>/ 100</span>
         </div>
       </div>
       <span
         className="text-xs font-bold tracking-widest px-3 py-1 rounded-full"
-        style={{ color, background: `${color}15`, border: `1px solid ${color}30` }}
+        style={{ color, background: bgColor, border: `1px solid ${color}` }}
       >
         {label}
       </span>
       {/* Legend */}
-      <div className="flex gap-3 text-xs text-[#4a6080]">
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#00FFB2]" />0–30</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F2C94C]" />30–70</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#FF3B3B]" />70+</span>
+      <div className="flex gap-3 text-xs" style={{ color: '#6b5a45' }}>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#2d6a4f' }} />0–30</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#b7770d' }} />30–70</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#c0392b' }} />70+</span>
       </div>
     </div>
   )

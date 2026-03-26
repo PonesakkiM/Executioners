@@ -56,4 +56,20 @@ export const api = {
   deleteQuarantine: (name) => del(`/quarantine/${encodeURIComponent(name)}`),
   restoreQuarantine:(name) => req(`/quarantine/${encodeURIComponent(name)}/restore`, { method: 'POST' }),
   reset:            () => req('/reset', { method: 'POST' }),
+  simulateExfil:    () => req('/simulate-exfiltration', { method: 'POST' }),
+  exfilStatus:      () => req('/exfiltration/status'),
+  resetExfil:       () => req('/exfiltration/reset', { method: 'POST' }),
+  // Prevention
+  preventionStatus: () => req('/prevention/status'),
+  preventRespond:   () => req('/prevention/respond',  { method: 'POST' }),
+  preventLock:      () => req('/prevention/lock',     { method: 'POST' }),
+  preventUnlock:    () => req('/prevention/unlock',   { method: 'POST' }),
+  preventEncrypt:   () => req('/prevention/encrypt',  { method: 'POST' }),
+  preventDecrypt:   () => req('/prevention/decrypt',  { method: 'POST' }),
+  preventReset:     () => req('/prevention/reset',    { method: 'POST' }),
+  scanUrl:          (url, by) => req('/scan-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, scanned_by: by ?? 'user' }),
+  }),
 }

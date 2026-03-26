@@ -3,13 +3,15 @@ import { Shield, CheckCircle, AlertTriangle } from 'lucide-react'
 export default function SystemStatusCard({ status = 'secure', score = 0 }) {
   const isAttack = status === 'critical'
   const isWarn   = status === 'warning'
-  const color    = isAttack ? '#FF3B3B' : isWarn ? '#F2C94C' : '#00FFB2'
+  const color    = isAttack ? '#c0392b' : isWarn ? '#b7770d' : '#2d6a4f'
+  const bgColor  = isAttack ? '#fde8e6' : isWarn ? '#fef3cd' : '#d4edda'
+  const borderColor = isAttack ? '#c0392b' : isWarn ? '#b7770d' : '#2d6a4f'
   const label    = isAttack ? 'UNDER ATTACK' : isWarn ? 'WARNING' : 'PROTECTED'
 
   return (
     <div
-      className="glass rounded-xl p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden"
-      style={{ boxShadow: `0 0 30px ${color}20` }}
+      className="rounded-xl p-6 flex flex-col items-center justify-center gap-4 relative overflow-hidden"
+      style={{ background: '#FFFFFF', border: `1px solid ${borderColor}`, boxShadow: `0 2px 8px ${color}20` }}
     >
       {/* Scan line effect */}
       {isAttack && (
@@ -22,14 +24,10 @@ export default function SystemStatusCard({ status = 'secure', score = 0 }) {
       {/* Shield icon */}
       <div className="relative">
         <div
-          className="absolute inset-0 rounded-full blur-xl opacity-40"
-          style={{ background: color, transform: 'scale(1.5)' }}
-        />
-        <div
           className={`relative p-5 rounded-full`}
           style={{
-            background: `${color}15`,
-            border: `2px solid ${color}40`,
+            background: bgColor,
+            border: `2px solid ${borderColor}`,
             animation: isAttack ? 'pulse-red 1.2s ease-in-out infinite' : 'pulse-green 2s ease-in-out infinite',
           }}
         >
@@ -39,18 +37,18 @@ export default function SystemStatusCard({ status = 'secure', score = 0 }) {
 
       {/* Label */}
       <div className="text-center">
-        <p className="text-xs text-[#4a6080] uppercase tracking-widest mb-1">System Status</p>
-        <p className="text-xl font-bold" style={{ color, textShadow: `0 0 20px ${color}80` }}>
+        <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#6b5a45' }}>System Status</p>
+        <p className="text-xl font-bold" style={{ color }}>
           {label}
         </p>
       </div>
 
       {/* Stats row */}
-      <div className="flex gap-6 pt-2 border-t border-[#1a2d4a] w-full justify-center">
+      <div className="flex gap-6 pt-2 w-full justify-center border-t" style={{ borderColor: '#D1BFA2' }}>
         {[['48', 'Nodes'], ['284K', 'Files'], ['99.97%', 'Uptime']].map(([v, l]) => (
           <div key={l} className="text-center">
-            <p className="text-white font-bold text-lg">{v}</p>
-            <p className="text-[#4a6080] text-xs">{l}</p>
+            <p className="font-bold text-lg" style={{ color: '#1a1a1a' }}>{v}</p>
+            <p className="text-xs" style={{ color: '#6b5a45' }}>{l}</p>
           </div>
         ))}
       </div>

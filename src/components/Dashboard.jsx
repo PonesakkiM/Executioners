@@ -12,9 +12,10 @@ import MonitoredPathsPanel  from './MonitoredPathsPanel'
 import MonitoredFilesPanel  from './MonitoredFilesPanel'
 import HumanDefensePanel    from './HumanDefensePanel'
 import AttackControlPanel   from './AttackControlPanel'
+import ExfiltrationPanel    from './ExfiltrationPanel'
 
 export default function Dashboard({ onStatusChange }) {
-  const [sys, setSys] = useState({ status: 'secure', threat_score: 0, canary_hit: false, canary_intact: true })
+  const [sys, setSys] = useState({ status: 'secure', threat_score: 0, canary_hit: false, canary_intact: true, exfiltration: {} })
   const [filesKey, setFilesKey] = useState(0)
 
   const refresh = () => {
@@ -84,8 +85,11 @@ export default function Dashboard({ onStatusChange }) {
         </div>
       </div>
 
-      {/* Row 5: Human defense */}
-      <HumanDefensePanel />
+      {/* Row 5: Exfiltration + Human defense */}
+      <div className="grid grid-cols-2 gap-4">
+        <ExfiltrationPanel />
+        <HumanDefensePanel />
+      </div>
     </div>
   )
 }

@@ -33,22 +33,26 @@ export default function MonitoredPathsPanel() {
   }
 
   return (
-    <div className="glass rounded-xl p-5">
+    <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
       <div className="flex items-center gap-2 mb-4">
-        <FolderOpen size={14} className="text-[#00FFB2]" />
-        <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Monitored Directories</p>
-        <span className="ml-auto text-xs text-[#00FFB2]">{paths.filter(p=>p.active).length} active</span>
+        <FolderOpen size={14} style={{ color: '#2d6a4f' }} />
+        <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Monitored Directories</p>
+        <span className="ml-auto text-xs" style={{ color: '#2d6a4f' }}>{paths.filter(p=>p.active).length} active</span>
       </div>
 
       <div className="space-y-2 mb-3">
         {paths.map((p, i) => (
-          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#0a1628] border border-[#1a2d4a] hover:border-[#2a3d55] transition-colors">
-            <Shield size={13} className={p.active ? 'text-[#00FFB2]' : 'text-[#2a3d55]'} />
-            <span className={`flex-1 text-sm font-mono truncate ${p.active ? 'text-white' : 'text-[#2a3d55]'}`}>{p.path}</span>
+          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
+            style={{ background: '#F5F5DC', border: '1px solid #D1BFA2' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = '#C2A68D'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = '#D1BFA2'}
+          >
+            <Shield size={13} style={{ color: p.active ? '#2d6a4f' : '#C2A68D' }} />
+            <span className="flex-1 text-sm font-mono truncate" style={{ color: p.active ? '#1a1a1a' : '#6b5a45' }}>{p.path}</span>
             <button onClick={() => toggle(i)} className="shrink-0 transition-colors">
               {p.active
-                ? <ToggleRight size={20} className="text-[#00FFB2]" />
-                : <ToggleLeft  size={20} className="text-[#2a3d55]" />
+                ? <ToggleRight size={20} style={{ color: '#2d6a4f' }} />
+                : <ToggleLeft  size={20} style={{ color: '#C2A68D' }} />
               }
             </button>
           </div>
@@ -61,12 +65,18 @@ export default function MonitoredPathsPanel() {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && addPath()}
           placeholder="/path/to/directory"
-          className="flex-1 bg-[#0a1628] border border-[#1a2d4a] rounded-lg px-3 py-2 text-xs text-white placeholder-[#2a3d55] focus:outline-none focus:border-[#2F80ED] transition-colors font-mono"
+          className="flex-1 rounded-lg px-3 py-2 text-xs placeholder-[#C2A68D] focus:outline-none font-mono transition-colors"
+          style={{ background: '#F5F5DC', border: '1px solid #D1BFA2', color: '#1a1a1a' }}
+          onFocus={e => e.target.style.borderColor = '#C2A68D'}
+          onBlur={e => e.target.style.borderColor = '#D1BFA2'}
         />
         <button
           onClick={addPath}
           disabled={adding}
-          className="flex items-center gap-1.5 text-xs bg-[#2F80ED]/10 border border-[#2F80ED]/30 text-[#2F80ED] px-3 py-2 rounded-lg hover:bg-[#2F80ED]/20 transition-colors disabled:opacity-40"
+          className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg transition-colors disabled:opacity-40"
+          style={{ color: '#C2A68D', border: '1px solid #C2A68D', background: 'transparent' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#D1BFA2'; e.currentTarget.style.color = '#1a1a1a' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C2A68D' }}
         >
           {adding ? <RefreshCw size={12} className="animate-spin" /> : <Plus size={12} />}
           Add

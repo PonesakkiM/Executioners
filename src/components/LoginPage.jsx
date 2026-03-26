@@ -14,7 +14,6 @@ export default function LoginPage({ onLogin }) {
     setError('')
     setLoading(true)
 
-    // Timeout after 8 seconds so it never spins forever
     const timeout = new Promise(r => setTimeout(() => r(null), 8000))
     const res = await Promise.race([
       api.login(email.trim().toLowerCase(), password),
@@ -27,39 +26,33 @@ export default function LoginPage({ onLogin }) {
       await api.setSession(res.user)
       onLogin(res.user)
     } else {
-      // Wrong credentials — error already shown, email sent by backend
       setError(res?.error ?? 'Invalid email or password.')
     }
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050d1a]">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-[0.06]"
-          style={{ background: '#00FFB2' }} />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F5DC' }}>
       <div className="relative w-full max-w-sm mx-auto px-6 flex flex-col items-center">
 
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <div className="p-4 rounded-2xl mb-4"
-            style={{ background: 'rgba(0,255,178,0.08)', border: '1px solid rgba(0,255,178,0.2)' }}>
-            <Shield size={32} className="text-[#00FFB2]" strokeWidth={1.5} />
+            style={{ background: '#d4edda', border: '1px solid #2d6a4f' }}>
+            <Shield size={32} style={{ color: '#2d6a4f' }} strokeWidth={1.5} />
           </div>
-          <h1 className="text-2xl font-bold text-white">SentinelShield AI</h1>
-          <p className="text-[#4a6080] text-sm mt-1">Ransomware Defense Platform</p>
+          <h1 className="text-2xl font-bold" style={{ color: '#1a1a1a' }}>SentinelShield AI</h1>
+          <p className="text-sm mt-1" style={{ color: '#6b5a45' }}>Ransomware Defense Platform</p>
         </div>
 
         {/* Form card */}
-        <div className="w-full rounded-2xl p-8" style={{ background: '#0a1628', border: '1px solid #1a2d4a' }}>
-          <h2 className="text-white font-semibold text-base mb-1 text-center">Welcome back</h2>
-          <p className="text-[#4a6080] text-xs text-center mb-6">Sign in with your company credentials</p>
+        <div className="w-full rounded-2xl p-8" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
+          <h2 className="font-semibold text-base mb-1 text-center" style={{ color: '#1a1a1a' }}>Welcome back</h2>
+          <p className="text-xs text-center mb-6" style={{ color: '#6b5a45' }}>Sign in with your company credentials</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
-              <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#2a3d55] pointer-events-none" />
+              <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#C2A68D' }} />
               <input
                 type="email"
                 value={email}
@@ -67,12 +60,15 @@ export default function LoginPage({ onLogin }) {
                 placeholder="company@sentinelshield.ai"
                 required
                 autoComplete="email"
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm text-white placeholder-[#2a3d55] bg-[#050d1a] border border-[#1a2d4a] focus:outline-none focus:border-[#2F80ED] transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm placeholder-[#C2A68D] focus:outline-none transition-colors"
+                style={{ background: '#F5F5DC', border: '1px solid #D1BFA2', color: '#1a1a1a' }}
+                onFocus={e => e.target.style.borderColor = '#C2A68D'}
+                onBlur={e => e.target.style.borderColor = '#D1BFA2'}
               />
             </div>
 
             <div className="relative">
-              <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#2a3d55] pointer-events-none" />
+              <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#C2A68D' }} />
               <input
                 type={showPw ? 'text' : 'password'}
                 value={password}
@@ -80,17 +76,24 @@ export default function LoginPage({ onLogin }) {
                 placeholder="Password"
                 required
                 autoComplete="current-password"
-                className="w-full pl-10 pr-10 py-3 rounded-xl text-sm text-white placeholder-[#2a3d55] bg-[#050d1a] border border-[#1a2d4a] focus:outline-none focus:border-[#2F80ED] transition-colors"
+                className="w-full pl-10 pr-10 py-3 rounded-xl text-sm placeholder-[#C2A68D] focus:outline-none transition-colors"
+                style={{ background: '#F5F5DC', border: '1px solid #D1BFA2', color: '#1a1a1a' }}
+                onFocus={e => e.target.style.borderColor = '#C2A68D'}
+                onBlur={e => e.target.style.borderColor = '#D1BFA2'}
               />
               <button type="button" onClick={() => setShowPw(s => !s)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#2a3d55] hover:text-[#4a6080] transition-colors">
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: '#C2A68D' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#6b5a45'}
+                onMouseLeave={e => e.currentTarget.style.color = '#C2A68D'}
+              >
                 {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-[#FF3B3B]"
-                style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)' }}>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
+                style={{ background: '#fde8e6', border: '1px solid #c0392b', color: '#c0392b' }}>
                 <AlertTriangle size={12} className="shrink-0" /> {error}
               </div>
             )}
@@ -99,7 +102,7 @@ export default function LoginPage({ onLogin }) {
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 disabled:opacity-50 mt-1"
-              style={{ background: 'rgba(0,255,178,0.12)', border: '1px solid rgba(0,255,178,0.35)', color: '#00FFB2' }}
+              style={{ background: '#C2A68D', border: '1px solid #BFAF8D', color: '#1a1a1a' }}
             >
               {loading
                 ? <><Loader size={14} className="animate-spin" /> Authenticating...</>
@@ -109,7 +112,7 @@ export default function LoginPage({ onLogin }) {
           </form>
         </div>
 
-        <p className="text-[#2a3d55] text-xs mt-6">© 2026 SentinelShield Technologies · v2.4.1-beta</p>
+        <p className="text-xs mt-6" style={{ color: '#6b5a45' }}>© 2026 SentinelShield Technologies · v2.4.1-beta</p>
       </div>
     </div>
   )

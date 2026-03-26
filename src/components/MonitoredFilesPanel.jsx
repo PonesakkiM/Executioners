@@ -4,9 +4,9 @@ import { FileText, Lock, Shield, RefreshCw, AlertTriangle, Eye, FolderOpen, Shie
 import FileModal from './FileModal'
 
 const statusStyle = {
-  normal:    { color: '#00FFB2', bg: 'rgba(0,255,178,0.06)',  border: 'rgba(0,255,178,0.15)',  icon: FileText  },
-  encrypted: { color: '#FF3B3B', bg: 'rgba(255,59,59,0.08)',  border: 'rgba(255,59,59,0.3)',   icon: Lock      },
-  canary:    { color: '#F2C94C', bg: 'rgba(242,201,76,0.06)', border: 'rgba(242,201,76,0.15)', icon: Shield    },
+  normal:    { color: '#2d6a4f', bg: '#d4edda',  border: '#a8d5b5',  icon: FileText  },
+  encrypted: { color: '#c0392b', bg: '#fde8e6',  border: '#f5c6c2',  icon: Lock      },
+  canary:    { color: '#b7770d', bg: '#fef3cd',  border: '#fde68a',  icon: Shield    },
 }
 
 export default function MonitoredFilesPanel({ onRefresh }) {
@@ -37,14 +37,12 @@ export default function MonitoredFilesPanel({ onRefresh }) {
 
   useEffect(() => {
     load()
-    // Auto-refresh every 3s so attacked files appear immediately
     const id = setInterval(load, 3000)
     return () => clearInterval(id)
   }, [])
 
   const attackedFiles  = files.filter(f => f.status === 'encrypted')
   const normalFiles    = files.filter(f => f.status === 'normal')
-  const canaryFiles    = files.filter(f => f.status === 'canary')
 
   const quarantineAll = async () => {
     setQuarantining(true)
@@ -70,15 +68,15 @@ export default function MonitoredFilesPanel({ onRefresh }) {
 
   return (
     <>
-      <div className="glass rounded-xl p-5 flex flex-col h-full relative">
+      <div className="rounded-xl p-5 flex flex-col h-full relative" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
 
         {/* Toast */}
         {toast && (
-          <div className={`absolute top-3 left-3 right-3 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border ${
-            toast.ok
-              ? 'bg-[#00FFB2]/10 border-[#00FFB2]/30 text-[#00FFB2]'
-              : 'bg-[#FF3B3B]/10 border-[#FF3B3B]/30 text-[#FF3B3B]'
-          }`}>
+          <div className="absolute top-3 left-3 right-3 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border"
+            style={toast.ok
+              ? { background: '#d4edda', borderColor: '#2d6a4f', color: '#2d6a4f' }
+              : { background: '#fde8e6', borderColor: '#c0392b', color: '#c0392b' }
+            }>
             {toast.ok ? <CheckCircle size={12} /> : <AlertTriangle size={12} />}
             {toast.msg}
           </div>
@@ -86,33 +84,29 @@ export default function MonitoredFilesPanel({ onRefresh }) {
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <FolderOpen size={14} className="text-[#00FFB2]" />
-          <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Monitored Files</p>
+          <FolderOpen size={14} style={{ color: '#2d6a4f' }} />
+          <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Monitored Files</p>
           <div className="ml-auto flex items-center gap-2">
             {attackedFiles.length > 0 && (
-              <span className="flex items-center gap-1 text-xs text-[#FF3B3B] bg-[#FF3B3B]/10 border border-[#FF3B3B]/20 px-2 py-0.5 rounded-full animate-pulse">
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full animate-pulse"
+                style={{ color: '#c0392b', background: '#fde8e6', border: '1px solid #f5c6c2' }}>
                 <AlertTriangle size={10} /> {attackedFiles.length} encrypted
               </span>
             )}
-            <span className="text-xs text-[#00FFB2]">{normalFiles.length} safe</span>
-            <button onClick={load} className="text-[#4a6080] hover:text-white transition-colors">
+            <span className="text-xs" style={{ color: '#2d6a4f' }}>{normalFiles.length} safe</span>
+            <button onClick={load} className="transition-colors" style={{ color: '#6b5a45' }}>
               <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
             </button>
           </div>
         </div>
 
-        {/* Quarantine all attacked button — only shows when there are attacked files */}
+        {/* Quarantine all attacked button */}
         {attackedFiles.length > 0 && (
           <button
             onClick={quarantineAll}
             disabled={quarantining}
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold mb-3 transition-all hover:scale-[1.01] disabled:opacity-50"
-            style={{
-              color: '#FF3B3B',
-              background: 'rgba(255,59,59,0.1)',
-              border: '1px solid rgba(255,59,59,0.35)',
-              boxShadow: '0 0 20px rgba(255,59,59,0.15)',
-            }}
+            style={{ color: '#c0392b', background: '#fde8e6', border: '1px solid #c0392b' }}
           >
             {quarantining
               ? <RefreshCw size={14} className="animate-spin" />
@@ -128,7 +122,7 @@ export default function MonitoredFilesPanel({ onRefresh }) {
         {/* File list */}
         <div className="flex-1 overflow-y-auto scrollbar-thin space-y-1.5">
           {files.length === 0 && (
-            <p className="text-[#4a6080] text-xs text-center py-6">
+            <p className="text-xs text-center py-6" style={{ color: '#6b5a45' }}>
               {loading ? 'Loading files...' : 'No files — backend may be offline'}
             </p>
           )}
@@ -144,39 +138,40 @@ export default function MonitoredFilesPanel({ onRefresh }) {
               >
                 <Icon size={14} style={{ color: s.color }} className="shrink-0" />
 
-                {/* File info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-xs font-mono truncate">{f.name}</p>
-                  <p className="text-[#4a6080] text-xs">{(f.size / 1024).toFixed(1)} KB</p>
+                  <p className="text-xs font-mono truncate" style={{ color: '#1a1a1a' }}>{f.name}</p>
+                  <p className="text-xs" style={{ color: '#6b5a45' }}>{(f.size / 1024).toFixed(1)} KB</p>
                 </div>
 
-                {/* Status badge */}
                 <span
                   className="text-xs px-2 py-0.5 rounded-full shrink-0 font-medium"
-                  style={{ color: s.color, background: `${s.color}15`, border: `1px solid ${s.color}30` }}
+                  style={{ color: s.color, background: '#FFFFFF', border: `1px solid ${s.color}` }}
                 >
                   {f.status}
                 </span>
 
-                {/* Actions */}
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {/* View button */}
                   <button
                     onClick={() => setSelected(f)}
                     title="View file content"
-                    className="p-1.5 rounded-lg transition-colors hover:bg-[#2F80ED]/20"
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ color: '#6b5a45' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#D1BFA2'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
-                    <Eye size={12} className="text-[#2a3d55] group-hover:text-[#2F80ED] transition-colors" />
+                    <Eye size={12} />
                   </button>
 
-                  {/* Quarantine single file button — only for encrypted */}
                   {f.status === 'encrypted' && (
                     <button
                       onClick={() => quarantineOne(f.name)}
                       title="Move to quarantine"
-                      className="p-1.5 rounded-lg transition-colors hover:bg-[#FF3B3B]/20"
+                      className="p-1.5 rounded-lg transition-colors"
+                      style={{ color: '#c0392b' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#fde8e6'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <ShieldAlert size={12} className="text-[#FF3B3B]/50 hover:text-[#FF3B3B] transition-colors" />
+                      <ShieldAlert size={12} />
                     </button>
                   )}
                 </div>
@@ -186,13 +181,13 @@ export default function MonitoredFilesPanel({ onRefresh }) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#1a2d4a]">
+        <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: '#D1BFA2' }}>
           {[
-            ['#00FFB2', 'Normal'],
-            ['#FF3B3B', 'Encrypted'],
-            ['#F2C94C', 'Canary'],
+            ['#2d6a4f', 'Normal'],
+            ['#c0392b', 'Encrypted'],
+            ['#b7770d', 'Canary'],
           ].map(([color, label]) => (
-            <span key={label} className="flex items-center gap-1.5 text-xs text-[#4a6080]">
+            <span key={label} className="flex items-center gap-1.5 text-xs" style={{ color: '#6b5a45' }}>
               <span className="w-2 h-2 rounded-full" style={{ background: color }} />
               {label}
             </span>
@@ -200,7 +195,6 @@ export default function MonitoredFilesPanel({ onRefresh }) {
         </div>
       </div>
 
-      {/* File viewer modal */}
       {selected && (
         <FileModal
           file={selected}

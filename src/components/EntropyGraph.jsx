@@ -16,9 +16,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   const val = payload[0].value
   const danger = val > 7.5
   return (
-    <div className="glass rounded-lg px-3 py-2 text-xs">
-      <p className="text-[#4a6080]">{label}</p>
-      <p style={{ color: danger ? '#FF3B3B' : '#00FFB2' }} className="font-mono font-bold">
+    <div className="rounded-lg px-3 py-2 text-xs" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
+      <p style={{ color: '#6b5a45' }}>{label}</p>
+      <p style={{ color: danger ? '#c0392b' : '#2d6a4f' }} className="font-mono font-bold">
         Entropy: {val.toFixed(2)} {danger ? '⚠ DANGEROUS' : ''}
       </p>
     </div>
@@ -28,7 +28,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function EntropyGraph() {
   const [data, setData] = useState(DUMMY_DATA)
 
-  // Simulate live entropy updates
   useEffect(() => {
     const id = setInterval(() => {
       setData(prev => {
@@ -46,36 +45,36 @@ export default function EntropyGraph() {
   }, [])
 
   return (
-    <div className="glass rounded-xl p-5">
+    <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
       <div className="flex items-center gap-2 mb-4">
-        <Activity size={14} className="text-[#2F80ED]" />
-        <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">File Entropy Analysis</p>
-        <span className="ml-auto text-xs text-[#FF3B3B] flex items-center gap-1">
-          <span className="w-2 h-0.5 bg-[#FF3B3B]" /> Danger threshold (7.5)
+        <Activity size={14} style={{ color: '#C2A68D' }} />
+        <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>File Entropy Analysis</p>
+        <span className="ml-auto text-xs flex items-center gap-1" style={{ color: '#c0392b' }}>
+          <span className="w-2 h-0.5 inline-block" style={{ background: '#c0392b' }} /> Danger threshold (7.5)
         </span>
       </div>
       <ResponsiveContainer width="100%" height={160}>
         <AreaChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
           <defs>
             <linearGradient id="entropyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="#2F80ED" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#2F80ED" stopOpacity={0} />
+              <stop offset="5%"  stopColor="#C2A68D" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#C2A68D" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="dangerGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="#FF3B3B" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#FF3B3B" stopOpacity={0} />
+              <stop offset="5%"  stopColor="#c0392b" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#c0392b" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1a2d4a" />
-          <XAxis dataKey="time" tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} />
-          <YAxis domain={[0, 8]} tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#D1BFA2" />
+          <XAxis dataKey="time" tick={{ fill: '#6b5a45', fontSize: 10 }} axisLine={false} tickLine={false} />
+          <YAxis domain={[0, 8]} tick={{ fill: '#6b5a45', fontSize: 10 }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={7.5} stroke="#FF3B3B" strokeDasharray="4 4" strokeOpacity={0.7} />
+          <ReferenceLine y={7.5} stroke="#c0392b" strokeDasharray="4 4" strokeOpacity={0.7} />
           <Area
             type="monotone" dataKey="entropy"
-            stroke="#2F80ED" strokeWidth={2}
+            stroke="#C2A68D" strokeWidth={2}
             fill="url(#entropyGrad)"
-            dot={false} activeDot={{ r: 4, fill: '#2F80ED' }}
+            dot={false} activeDot={{ r: 4, fill: '#C2A68D' }}
           />
         </AreaChart>
       </ResponsiveContainer>

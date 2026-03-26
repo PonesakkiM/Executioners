@@ -1,0 +1,3 @@
+HONEYPOT — SentinelShield Exfiltration Trap
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA...[FAKE]

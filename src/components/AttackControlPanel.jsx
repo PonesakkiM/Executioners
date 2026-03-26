@@ -8,39 +8,39 @@ export default function AttackControlPanel({ onRefresh, systemStatus }) {
   const [log, setLog]               = useState([])
   const [showDetail, setShowDetail] = useState(false)
 
-  const addLog = (msg, color = '#00FFB2') => setLog(prev => [{ msg, color, t: new Date().toLocaleTimeString() }, ...prev].slice(0, 6))
+  const addLog = (msg, type = 'ok') => setLog(prev => [{ msg, type, t: new Date().toLocaleTimeString() }, ...prev].slice(0, 6))
 
   const run = async (id, label, fn, successMsg) => {
     setLoading(id)
-    addLog(`${label}...`, '#F2C94C')
+    addLog(`${label}...`, 'warn')
     const res = await fn()
-    if (res) addLog(successMsg ?? `${label} complete`, '#00FFB2')
-    else     addLog(`${label} failed — backend offline?`, '#FF3B3B')
+    if (res) addLog(successMsg ?? `${label} complete`, 'ok')
+    else     addLog(`${label} failed — backend offline?`, 'err')
     setLoading(null)
     onRefresh?.()
   }
 
-  const handleAttack = () => run('attack', 'Simulating attack', api.simulateAttack,
-    'Attack started — watch threat score rise')
-
-  const handleContain = () => run('contain', 'Containing threat', api.contain,
-    'Threat contained — score reset')
-
-  const handleSnapshot = () => run('snapshot', 'Taking snapshot', api.takeSnapshot,
-    'Snapshot created — files backed up')
+  const handleAttack   = () => run('attack',   'Simulating attack',  api.simulateAttack, 'Attack started — watch threat score rise')
+  const handleContain  = () => run('contain',  'Containing threat',  api.contain,        'Threat contained — score reset')
+  const handleSnapshot = () => run('snapshot', 'Taking snapshot',    api.takeSnapshot,   'Snapshot created — files backed up')
 
   const isUnderAttack = systemStatus === 'critical' || systemStatus === 'warning'
 
+  const logColor = { ok: '#2d6a4f', warn: '#b7770d', err: '#c0392b' }
+
   return (
     <>
-      <div className="glass rounded-xl p-5">
+      <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Play size={14} className="text-[#F2C94C]" />
-          <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Controls</p>
+          <Play size={14} style={{ color: '#b7770d' }} />
+          <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Controls</p>
           {isUnderAttack && (
             <button
               onClick={() => setShowDetail(true)}
-              className="ml-auto flex items-center gap-1 text-xs text-[#FF3B3B] border border-[#FF3B3B]/30 px-2 py-1 rounded-lg hover:bg-[#FF3B3B]/10 transition-colors animate-pulse"
+              className="ml-auto flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors animate-pulse"
+              style={{ color: '#c0392b', border: '1px solid #c0392b', background: 'transparent' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#fde8e6'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <Info size={11} /> Attack Details
             </button>
@@ -53,7 +53,7 @@ export default function AttackControlPanel({ onRefresh, systemStatus }) {
             onClick={handleAttack}
             disabled={!!loading}
             className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.01] disabled:opacity-40 disabled:scale-100"
-            style={{ color: '#FF3B3B', background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.25)' }}
+            style={{ color: '#c0392b', background: '#fde8e6', border: '1px solid #c0392b' }}
           >
             {loading === 'attack' ? <RefreshCw size={14} className="animate-spin" /> : <Zap size={14} />}
             Simulate Attack
@@ -65,7 +65,7 @@ export default function AttackControlPanel({ onRefresh, systemStatus }) {
               onClick={handleContain}
               disabled={!!loading}
               className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.01] disabled:opacity-40"
-              style={{ color: '#F2C94C', background: 'rgba(242,201,76,0.08)', border: '1px solid rgba(242,201,76,0.25)' }}
+              style={{ color: '#b7770d', background: '#fef3cd', border: '1px solid #b7770d' }}
             >
               {loading === 'contain' ? <RefreshCw size={14} className="animate-spin" /> : <ShieldOff size={14} />}
               Contain
@@ -76,7 +76,7 @@ export default function AttackControlPanel({ onRefresh, systemStatus }) {
               onClick={handleSnapshot}
               disabled={!!loading}
               className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-[1.01] disabled:opacity-40"
-              style={{ color: '#00FFB2', background: 'rgba(0,255,178,0.08)', border: '1px solid rgba(0,255,178,0.25)' }}
+              style={{ color: '#2d6a4f', background: '#d4edda', border: '1px solid #2d6a4f' }}
             >
               {loading === 'snapshot' ? <RefreshCw size={14} className="animate-spin" /> : <RotateCcw size={14} />}
               Snapshot
@@ -86,10 +86,10 @@ export default function AttackControlPanel({ onRefresh, systemStatus }) {
 
         {/* Log */}
         {log.length > 0 && (
-          <div className="bg-[#050d1a] rounded-lg p-3 font-mono text-xs space-y-1 border border-[#1a2d4a]">
+          <div className="rounded-lg p-3 font-mono text-xs space-y-1" style={{ background: '#F5F5DC', border: '1px solid #D1BFA2' }}>
             {log.map((l, i) => (
-              <p key={i} style={{ color: i === 0 ? l.color : '#2a3d55' }}>
-                <span className="text-[#1a2d4a]">{l.t} </span>{l.msg}
+              <p key={i} style={{ color: i === 0 ? logColor[l.type] : '#6b5a45' }}>
+                <span style={{ color: '#C2A68D' }}>{l.t} </span>{l.msg}
               </p>
             ))}
           </div>

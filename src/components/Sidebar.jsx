@@ -12,16 +12,15 @@ const nav = [
 
 export default function Sidebar({ active, onNavigate }) {
   return (
-    <aside className="w-[220px] shrink-0 flex flex-col h-screen bg-[#070f1e] border-r border-[#1a2d4a]">
+    <aside className="w-[220px] shrink-0 flex flex-col h-screen border-r" style={{ background: '#D1BFA2', borderColor: '#C2A68D' }}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-[#1a2d4a]">
+      <div className="flex items-center gap-3 px-5 py-5 border-b" style={{ background: '#FFFFFF', borderColor: '#C2A68D' }}>
         <div className="relative">
-          <Shield size={28} className="text-[#00FFB2]" strokeWidth={1.5} />
-          <span className="absolute inset-0 rounded-full animate-pulse-green opacity-60" />
+          <Shield size={28} style={{ color: '#2d6a4f' }} strokeWidth={1.5} />
         </div>
         <div>
-          <p className="text-white font-bold text-sm leading-tight">SentinelShield</p>
-          <p className="text-[#00FFB2] text-xs font-mono tracking-widest">AI</p>
+          <p className="font-bold text-sm leading-tight" style={{ color: '#1a1a1a' }}>SentinelShield</p>
+          <p className="text-xs font-mono tracking-widest" style={{ color: '#6b5a45' }}>AI</p>
         </div>
       </div>
 
@@ -33,20 +32,21 @@ export default function Sidebar({ active, onNavigate }) {
             <button
               key={id}
               onClick={() => onNavigate(id)}
-              className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group
-                ${isActive
-                  ? 'bg-[#00FFB2]/10 text-[#00FFB2] border border-[#00FFB2]/20'
-                  : 'text-[#4a6080] hover:text-white hover:bg-white/5 border border-transparent'}
-              `}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group border"
+              style={isActive
+                ? { background: '#C2A68D', color: '#1a1a1a', borderColor: '#BFAF8D' }
+                : { background: 'transparent', color: '#3d3020', borderColor: 'transparent' }
+              }
+              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = '#C2A68D'; e.currentTarget.style.color = '#1a1a1a' } }}
+              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#3d3020' } }}
             >
               <Icon
                 size={16}
-                className={`transition-all ${isActive ? 'text-[#00FFB2]' : 'group-hover:text-[#2F80ED]'}`}
+                style={{ color: isActive ? '#1a1a1a' : '#6b5a45' }}
               />
               <span className="font-medium">{label}</span>
               {isActive && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00FFB2] animate-pulse" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ background: '#1a1a1a' }} />
               )}
             </button>
           )
@@ -54,9 +54,9 @@ export default function Sidebar({ active, onNavigate }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-[#1a2d4a]">
-        <p className="text-[#2a3d55] text-xs font-mono">v2.4.1-beta</p>
-        <p className="text-[#2a3d55] text-xs mt-0.5">© 2026 SentinelShield</p>
+      <div className="px-5 py-4 border-t" style={{ borderColor: '#C2A68D' }}>
+        <p className="text-xs font-mono" style={{ color: '#6b5a45' }}>v2.4.1-beta</p>
+        <p className="text-xs mt-0.5" style={{ color: '#6b5a45' }}>© 2026 SentinelShield</p>
       </div>
     </aside>
   )

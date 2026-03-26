@@ -5,20 +5,22 @@ import {
   Eye, GitCompare, ShieldCheck, ShieldAlert, RefreshCw
 } from 'lucide-react'
 
-// ── Error boundary so a crash never blacks out the whole page ─────────────────
+// ── Error boundary ────────────────────────────────────────────────────────────
 class ModalErrorBoundary extends Component {
   state = { error: null }
   static getDerivedStateFromError(e) { return { error: e } }
   render() {
     if (this.state.error) return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.8)' }}>
-        <div className="glass rounded-2xl p-8 max-w-md w-full text-center space-y-4">
-          <AlertTriangle size={32} className="text-[#FF3B3B] mx-auto" />
-          <p className="text-white font-semibold">Failed to render file viewer</p>
-          <p className="text-[#4a6080] text-xs font-mono">{this.state.error?.message}</p>
+        style={{ background: 'rgba(0,0,0,0.5)' }}>
+        <div className="rounded-2xl p-8 max-w-md w-full text-center space-y-4"
+          style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
+          <AlertTriangle size={32} style={{ color: '#c0392b' }} className="mx-auto" />
+          <p className="font-semibold" style={{ color: '#1a1a1a' }}>Failed to render file viewer</p>
+          <p className="text-xs font-mono" style={{ color: '#6b5a45' }}>{this.state.error?.message}</p>
           <button onClick={this.props.onClose}
-            className="px-4 py-2 bg-[#2F80ED]/20 border border-[#2F80ED]/30 text-[#2F80ED] rounded-lg text-sm hover:bg-[#2F80ED]/30 transition-colors">
+            className="px-4 py-2 rounded-lg text-sm transition-colors"
+            style={{ background: '#D1BFA2', border: '1px solid #C2A68D', color: '#1a1a1a' }}>
             Close
           </button>
         </div>
@@ -29,25 +31,28 @@ class ModalErrorBoundary extends Component {
 }
 
 // ── Safe line renderer ────────────────────────────────────────────────────────
-function LineBlock({ lines = [], compareLines = [], color = '#8ba0b8', borderColor = '#1a2d4a', emptyMsg = 'No content' }) {
+function LineBlock({ lines = [], compareLines = [], color = '#3d3020', borderColor = '#D1BFA2', emptyMsg = 'No content' }) {
   if (!Array.isArray(lines) || lines.length === 0) {
     return (
       <div className="flex items-center justify-center h-24 rounded-lg border font-mono text-xs"
-        style={{ borderColor, background: '#050d1a' }}>
-        <p className="text-[#2a3d55]">{emptyMsg}</p>
+        style={{ borderColor, background: '#F5F5DC' }}>
+        <p style={{ color: '#6b5a45' }}>{emptyMsg}</p>
       </div>
     )
   }
   return (
-    <div className="rounded-lg border overflow-auto font-mono text-xs" style={{ borderColor, background: '#050d1a', maxHeight: 260 }}>
+    <div className="rounded-lg border overflow-auto font-mono text-xs" style={{ borderColor, background: '#F5F5DC', maxHeight: 260 }}>
       {lines.map((l, i) => {
         const raw = typeof l === 'string' ? l.replace(/\n$/, '') : String(l ?? '')
         const changed = compareLines.length > 0 && raw !== (typeof compareLines[i] === 'string' ? compareLines[i].replace(/\n$/, '') : '')
         return (
-          <div key={i} className="flex px-3 py-0.5 hover:bg-white/[0.02]"
-            style={{ background: changed ? `${color}08` : undefined }}>
-            <span className="text-[#1a2d4a] w-8 shrink-0 select-none text-right mr-3">{i + 1}</span>
-            <span style={{ color: changed ? color : '#8ba0b8' }}>{raw}</span>
+          <div key={i} className="flex px-3 py-0.5"
+            style={{ background: changed ? `${color}12` : undefined }}
+            onMouseEnter={e => e.currentTarget.style.background = '#EDE8D8'}
+            onMouseLeave={e => e.currentTarget.style.background = changed ? `${color}12` : 'transparent'}
+          >
+            <span className="w-8 shrink-0 select-none text-right mr-3" style={{ color: '#C2A68D' }}>{i + 1}</span>
+            <span style={{ color: changed ? color : '#3d3020' }}>{raw}</span>
           </div>
         )
       })}
@@ -72,12 +77,17 @@ function DiffView({ diff = [], beforeLines = [], afterLines = [], beforeSize = 0
 
   return (
     <div>
-      <div className="flex rounded-lg overflow-hidden border border-[#1a2d4a] mb-4 w-fit">
+      <div className="flex rounded-lg overflow-hidden mb-4 w-fit" style={{ border: '1px solid #D1BFA2' }}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => setView(t.id)}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === t.id ? 'bg-[#2F80ED] text-white' : 'text-[#4a6080] hover:text-white bg-[#0a1628]'
-            }`}>
+            className="px-3 py-1.5 text-xs font-medium transition-colors"
+            style={view === t.id
+              ? { background: '#C2A68D', color: '#1a1a1a' }
+              : { background: '#F5F5DC', color: '#6b5a45' }
+            }
+            onMouseEnter={e => { if (view !== t.id) e.currentTarget.style.color = '#1a1a1a' }}
+            onMouseLeave={e => { if (view !== t.id) e.currentTarget.style.color = '#6b5a45' }}
+          >
             {t.label}
           </button>
         ))}
@@ -87,38 +97,41 @@ function DiffView({ diff = [], beforeLines = [], afterLines = [], beforeSize = 0
         <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck size={13} className="text-[#00FFB2]" />
-              <span className="text-xs font-semibold text-[#00FFB2]">BEFORE ATTACK</span>
+              <ShieldCheck size={13} style={{ color: '#2d6a4f' }} />
+              <span className="text-xs font-semibold" style={{ color: '#2d6a4f' }}>BEFORE ATTACK</span>
             </div>
-            <LineBlock lines={safeBefore} borderColor="rgba(0,255,178,0.2)"
+            <LineBlock lines={safeBefore} borderColor="#a8d5b5"
               emptyMsg="No snapshot — take one before attacking" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <ShieldAlert size={13} className="text-[#FF3B3B]" />
-              <span className="text-xs font-semibold text-[#FF3B3B]">
+              <ShieldAlert size={13} style={{ color: '#c0392b' }} />
+              <span className="text-xs font-semibold" style={{ color: '#c0392b' }}>
                 AFTER ATTACK {isLocked ? '(Encrypted)' : '(Modified)'}
               </span>
             </div>
             <LineBlock lines={safeAfter} compareLines={safeBefore}
-              color="#FF3B3B" borderColor="rgba(255,59,59,0.2)"
+              color="#c0392b" borderColor="#f5c6c2"
               emptyMsg="File not in sandbox (quarantined?)" />
           </div>
         </div>
       )}
 
       {view === 'diff' && (
-        <div className="bg-[#050d1a] rounded-lg border border-[#1a2d4a] overflow-auto font-mono text-xs" style={{ maxHeight: 320 }}>
+        <div className="rounded-lg border overflow-auto font-mono text-xs" style={{ background: '#F5F5DC', borderColor: '#D1BFA2', maxHeight: 320 }}>
           {safeDiff.length === 0
-            ? <p className="p-4 text-[#4a6080]">No diff — files may be identical or no snapshot available</p>
+            ? <p className="p-4" style={{ color: '#6b5a45' }}>No diff — files may be identical or no snapshot available</p>
             : safeDiff.map((line, i) => {
               const l = typeof line === 'string' ? line : ''
+              const style = l.startsWith('+') && !l.startsWith('+++')
+                ? { background: '#d4edda', color: '#2d6a4f' }
+                : l.startsWith('-') && !l.startsWith('---')
+                ? { background: '#fde8e6', color: '#c0392b' }
+                : l.startsWith('@@')
+                ? { background: '#fef3cd', color: '#b7770d' }
+                : { color: '#6b5a45' }
               return (
-                <div key={i} className={`px-3 py-0.5 ${
-                  l.startsWith('+') && !l.startsWith('+++') ? 'bg-[#00FFB2]/08 text-[#00FFB2]' :
-                  l.startsWith('-') && !l.startsWith('---') ? 'bg-[#FF3B3B]/08 text-[#FF3B3B]' :
-                  l.startsWith('@@') ? 'text-[#2F80ED] bg-[#2F80ED]/08' : 'text-[#4a6080]'
-                }`}>{l || ' '}</div>
+                <div key={i} className="px-3 py-0.5" style={style}>{l || ' '}</div>
               )
             })
           }
@@ -126,11 +139,11 @@ function DiffView({ diff = [], beforeLines = [], afterLines = [], beforeSize = 0
       )}
 
       {view === 'before' && (
-        <LineBlock lines={safeBefore} borderColor="rgba(0,255,178,0.15)" emptyMsg="No snapshot available" />
+        <LineBlock lines={safeBefore} borderColor="#a8d5b5" emptyMsg="No snapshot available" />
       )}
 
       {view === 'after' && (
-        <LineBlock lines={safeAfter} color="#FF3B3B" borderColor="rgba(255,59,59,0.15)" emptyMsg="File not found" />
+        <LineBlock lines={safeAfter} color="#c0392b" borderColor="#f5c6c2" emptyMsg="File not found" />
       )}
     </div>
   )
@@ -145,20 +158,18 @@ function FileModalInner({ file, snapshots, onClose }) {
   const [loadingDiff, setLoadingDiff]   = useState(false)
   const [contentError, setContentError] = useState(null)
 
-  // Safe file props with defaults
-  const isLocked = Boolean(file?.is_locked)
-  const isCanary = Boolean(file?.is_canary)
-  const fileName = file?.name ?? 'unknown'
-  const filePath = file?.path ?? ''
-  const fileSize = Number(file?.size ?? 0)
-  const fileMod  = Number(file?.modified ?? 0)
-  const fileStatus = file?.status ?? 'normal'
+  const isLocked  = Boolean(file?.is_locked)
+  const isCanary  = Boolean(file?.is_canary)
+  const fileName  = file?.name ?? 'unknown'
+  const filePath  = file?.path ?? ''
+  const fileSize  = Number(file?.size ?? 0)
+  const fileMod   = Number(file?.modified ?? 0)
 
-  const accentColor = isLocked ? '#FF3B3B' : isCanary ? '#F2C94C' : '#2F80ED'
+  const accentColor = isLocked ? '#c0392b' : isCanary ? '#b7770d' : '#C2A68D'
+  const accentBg    = isLocked ? '#fde8e6' : isCanary ? '#fef3cd' : '#F5F5DC'
 
   const [tab, setTab] = useState(isLocked ? 'diff' : 'content')
 
-  // Load file content
   useEffect(() => {
     setLoadingContent(true)
     setContentError(null)
@@ -167,7 +178,6 @@ function FileModalInner({ file, snapshots, onClose }) {
       .catch(e => { setContentError(String(e)); setLoadingContent(false) })
   }, [fileName])
 
-  // Load diff
   const loadDiff = (idx) => {
     const snap = snapshots?.[idx]
     if (!snap) return
@@ -181,7 +191,6 @@ function FileModalInner({ file, snapshots, onClose }) {
     if (tab === 'diff') loadDiff(snapIdx)
   }, [tab, snapIdx])
 
-  // Auto-load diff for locked files
   useEffect(() => {
     if (isLocked && snapshots?.length) loadDiff(0)
   }, [isLocked])
@@ -191,34 +200,34 @@ function FileModalInner({ file, snapshots, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
+      style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
         className="w-full max-w-4xl rounded-2xl overflow-hidden flex flex-col"
         style={{
-          background: '#0a1628',
-          border: `1px solid ${accentColor}25`,
-          boxShadow: `0 0 50px ${accentColor}12, 0 20px 60px rgba(0,0,0,0.9)`,
+          background: '#FFFFFF',
+          border: `1px solid ${accentColor}`,
+          boxShadow: `0 8px 32px rgba(0,0,0,0.15)`,
           maxHeight: '90vh',
         }}
       >
         {/* ── Header ── */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1a2d4a] shrink-0">
-          <div className="p-2 rounded-lg shrink-0" style={{ background: `${accentColor}15` }}>
+        <div className="flex items-center gap-3 px-5 py-4 border-b shrink-0" style={{ borderColor: '#D1BFA2' }}>
+          <div className="p-2 rounded-lg shrink-0" style={{ background: accentBg }}>
             {isLocked
               ? <Lock size={16} style={{ color: accentColor }} />
               : <FileText size={16} style={{ color: accentColor }} />
             }
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white font-mono font-semibold text-sm truncate">{fileName}</p>
-            <p className="text-[#4a6080] text-xs font-mono truncate">{filePath}</p>
+            <p className="font-mono font-semibold text-sm truncate" style={{ color: '#1a1a1a' }}>{fileName}</p>
+            <p className="text-xs font-mono truncate" style={{ color: '#6b5a45' }}>{filePath}</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0 text-xs text-[#4a6080]">
+          <div className="flex items-center gap-3 shrink-0 text-xs" style={{ color: '#6b5a45' }}>
             {isLocked && (
               <span className="flex items-center gap-1 px-2 py-1 rounded-full font-bold"
-                style={{ color: '#FF3B3B', background: 'rgba(255,59,59,0.1)', border: '1px solid rgba(255,59,59,0.2)' }}>
+                style={{ color: '#c0392b', background: '#fde8e6', border: '1px solid #f5c6c2' }}>
                 <AlertTriangle size={11} /> ENCRYPTED
               </span>
             )}
@@ -227,45 +236,51 @@ function FileModalInner({ file, snapshots, onClose }) {
               <span>{new Date(fileMod * 1000).toLocaleTimeString('en-US', { hour12: false })}</span>
             )}
           </div>
-          <button onClick={onClose} className="text-[#4a6080] hover:text-white transition-colors ml-1 shrink-0">
+          <button onClick={onClose} className="transition-colors ml-1 shrink-0" style={{ color: '#6b5a45' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+            onMouseLeave={e => e.currentTarget.style.color = '#6b5a45'}
+          >
             <X size={18} />
           </button>
         </div>
 
         {/* ── Attack banner ── */}
         {isLocked && (
-          <div className="flex items-start gap-3 px-5 py-3 border-b border-[#1a2d4a] shrink-0"
-            style={{ background: 'rgba(255,59,59,0.05)' }}>
-            <AlertTriangle size={13} className="text-[#FF3B3B] shrink-0 mt-0.5" />
-            <p className="text-xs text-[#FF3B3B] leading-relaxed">
+          <div className="flex items-start gap-3 px-5 py-3 border-b shrink-0"
+            style={{ background: '#fde8e6', borderColor: '#f5c6c2' }}>
+            <AlertTriangle size={13} style={{ color: '#c0392b' }} className="shrink-0 mt-0.5" />
+            <p className="text-xs leading-relaxed" style={{ color: '#c0392b' }}>
               This file was <strong>XOR-encrypted</strong> by the ransomware simulation.
               Switch to <strong>Before / After</strong> to see original vs encrypted content.
               {content?.original_snapshot && (
-                <span className="text-[#4a6080]"> Original recovered from snapshot: </span>
+                <span style={{ color: '#6b5a45' }}> Original recovered from snapshot: </span>
               )}
               {content?.original_snapshot && (
-                <span className="text-[#00FFB2] font-mono">{content.original_snapshot}</span>
+                <span className="font-mono" style={{ color: '#2d6a4f' }}>{content.original_snapshot}</span>
               )}
             </p>
           </div>
         )}
 
         {/* ── Tabs ── */}
-        <div className="flex border-b border-[#1a2d4a] shrink-0">
+        <div className="flex border-b shrink-0" style={{ borderColor: '#D1BFA2' }}>
           {[
             { id: 'content', Icon: Eye,       label: 'File Content' },
             { id: 'diff',    Icon: GitCompare, label: 'Before / After' },
           ].map(({ id, Icon, label }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex items-center gap-2 px-5 py-3 text-xs font-medium border-b-2 transition-colors ${
-                tab === id
-                  ? 'border-[#2F80ED] text-[#2F80ED]'
-                  : 'border-transparent text-[#4a6080] hover:text-white'
-              }`}>
+              className="flex items-center gap-2 px-5 py-3 text-xs font-medium border-b-2 transition-colors"
+              style={tab === id
+                ? { borderColor: '#C2A68D', color: '#1a1a1a' }
+                : { borderColor: 'transparent', color: '#6b5a45' }
+              }
+              onMouseEnter={e => { if (tab !== id) e.currentTarget.style.color = '#1a1a1a' }}
+              onMouseLeave={e => { if (tab !== id) e.currentTarget.style.color = '#6b5a45' }}
+            >
               <Icon size={13} />
               {label}
               {id === 'diff' && isLocked && (
-                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-[#FF3B3B] animate-pulse" />
+                <span className="ml-1 w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#c0392b' }} />
               )}
             </button>
           ))}
@@ -278,55 +293,54 @@ function FileModalInner({ file, snapshots, onClose }) {
           {tab === 'content' && (
             <div className="space-y-4">
               {loadingContent && (
-                <div className="flex items-center gap-2 text-[#4a6080] text-xs py-8 justify-center">
+                <div className="flex items-center gap-2 text-xs py-8 justify-center" style={{ color: '#6b5a45' }}>
                   <RefreshCw size={14} className="animate-spin" /> Loading file content...
                 </div>
               )}
               {contentError && (
-                <div className="p-4 rounded-lg bg-[#FF3B3B]/08 border border-[#FF3B3B]/20 text-xs text-[#FF3B3B]">
+                <div className="p-4 rounded-lg text-xs" style={{ background: '#fde8e6', border: '1px solid #f5c6c2', color: '#c0392b' }}>
                   Error: {contentError}
                 </div>
               )}
               {!loadingContent && !contentError && content && (
                 <>
-                  {/* Locked: show original + encrypted side by side */}
                   {isLocked ? (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs font-semibold text-[#00FFB2] mb-2">
+                        <p className="text-xs font-semibold mb-2" style={{ color: '#2d6a4f' }}>
                           ✓ ORIGINAL (before attack)
                         </p>
                         <pre className="rounded-lg p-4 text-xs font-mono overflow-auto border whitespace-pre-wrap break-all"
-                          style={{ background: 'rgba(0,255,178,0.03)', borderColor: 'rgba(0,255,178,0.15)', color: '#8ba0b8', maxHeight: 300 }}>
+                          style={{ background: '#d4edda', borderColor: '#a8d5b5', color: '#3d3020', maxHeight: 300 }}>
                           {content.original_content ?? '— No snapshot found. Take a snapshot before attacking. —'}
                         </pre>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-[#FF3B3B] mb-2">
+                        <p className="text-xs font-semibold mb-2" style={{ color: '#c0392b' }}>
                           ✗ ENCRYPTED (after attack)
                         </p>
                         <pre className="rounded-lg p-4 text-xs font-mono overflow-auto border whitespace-pre-wrap break-all"
-                          style={{ background: 'rgba(255,59,59,0.04)', borderColor: 'rgba(255,59,59,0.2)', color: '#ff8080', maxHeight: 300 }}>
+                          style={{ background: '#fde8e6', borderColor: '#f5c6c2', color: '#c0392b', maxHeight: 300 }}>
                           {content.current_content ?? '— Could not read encrypted file —'}
                         </pre>
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <p className="text-xs font-semibold text-[#00FFB2] mb-2">FILE CONTENT</p>
+                      <p className="text-xs font-semibold mb-2" style={{ color: '#2d6a4f' }}>FILE CONTENT</p>
                       <pre className="rounded-lg p-4 text-xs font-mono overflow-auto border whitespace-pre-wrap break-all"
-                        style={{ background: 'rgba(0,255,178,0.03)', borderColor: 'rgba(0,255,178,0.1)', color: '#8ba0b8', maxHeight: 400 }}>
+                        style={{ background: '#F5F5DC', borderColor: '#D1BFA2', color: '#3d3020', maxHeight: 400 }}>
                         {content.current_content ?? '— Empty file —'}
                       </pre>
                     </div>
                   )}
                   {content.truncated && (
-                    <p className="text-[#4a6080] text-xs">⚠ Truncated at 8 KB</p>
+                    <p className="text-xs" style={{ color: '#6b5a45' }}>⚠ Truncated at 8 KB</p>
                   )}
                 </>
               )}
               {!loadingContent && !contentError && !content && (
-                <p className="text-[#4a6080] text-xs text-center py-8">
+                <p className="text-xs text-center py-8" style={{ color: '#6b5a45' }}>
                   Backend offline or file not found
                 </p>
               )}
@@ -337,38 +351,38 @@ function FileModalInner({ file, snapshots, onClose }) {
           {tab === 'diff' && (
             <div>
               {/* Snapshot picker */}
-              <div className="flex items-center gap-3 mb-4 p-3 bg-[#050d1a] rounded-lg border border-[#1a2d4a]">
-                <span className="text-xs text-[#4a6080] shrink-0">Compare with:</span>
+              <div className="flex items-center gap-3 mb-4 p-3 rounded-lg" style={{ background: '#F5F5DC', border: '1px solid #D1BFA2' }}>
+                <span className="text-xs shrink-0" style={{ color: '#6b5a45' }}>Compare with:</span>
                 {snapshots?.length > 0 ? (
                   <>
                     <button onClick={() => setSnapIdx(i => Math.max(0, i - 1))}
                       disabled={snapIdx === 0}
-                      className="text-[#4a6080] hover:text-white disabled:opacity-30 shrink-0">
+                      className="transition-colors disabled:opacity-30 shrink-0" style={{ color: '#6b5a45' }}>
                       <ChevronLeft size={14} />
                     </button>
                     <div className="flex-1 text-center min-w-0">
-                      <p className="text-white text-xs font-mono truncate">{snap?.snapshot_id ?? '—'}</p>
-                      <p className="text-[#4a6080] text-xs">
+                      <p className="text-xs font-mono truncate" style={{ color: '#1a1a1a' }}>{snap?.snapshot_id ?? '—'}</p>
+                      <p className="text-xs" style={{ color: '#6b5a45' }}>
                         {snap?.created_at ? new Date(snap.created_at).toLocaleString() : ''}
                         {snap?.file_count ? ` · ${snap.file_count} files` : ''}
                       </p>
                     </div>
                     <button onClick={() => setSnapIdx(i => Math.min((snapshots.length - 1), i + 1))}
                       disabled={snapIdx >= snapshots.length - 1}
-                      className="text-[#4a6080] hover:text-white disabled:opacity-30 shrink-0">
+                      className="transition-colors disabled:opacity-30 shrink-0" style={{ color: '#6b5a45' }}>
                       <ChevronRight size={14} />
                     </button>
-                    <span className="text-[#2a3d55] text-xs shrink-0">{snapIdx + 1}/{snapshots.length}</span>
+                    <span className="text-xs shrink-0" style={{ color: '#6b5a45' }}>{snapIdx + 1}/{snapshots.length}</span>
                   </>
                 ) : (
-                  <span className="text-[#FF3B3B] text-xs">
+                  <span className="text-xs" style={{ color: '#c0392b' }}>
                     No snapshots — click "Snapshot" in Controls first
                   </span>
                 )}
               </div>
 
               {loadingDiff && (
-                <div className="flex items-center gap-2 text-[#4a6080] text-xs py-8 justify-center">
+                <div className="flex items-center gap-2 text-xs py-8 justify-center" style={{ color: '#6b5a45' }}>
                   <RefreshCw size={14} className="animate-spin" /> Loading comparison...
                 </div>
               )}
@@ -385,7 +399,7 @@ function FileModalInner({ file, snapshots, onClose }) {
               )}
 
               {!loadingDiff && !diff && snapshots?.length > 0 && (
-                <p className="text-[#4a6080] text-xs text-center py-8">
+                <p className="text-xs text-center py-8" style={{ color: '#6b5a45' }}>
                   Click a snapshot above to load comparison
                 </p>
               )}

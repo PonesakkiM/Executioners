@@ -11,6 +11,7 @@ from watchdog.events import FileSystemEventHandler
 
 from engines.canary import is_canary, handle_canary_hit
 from engines.behavioral import record_modification, check_rename_pattern
+from engines.exfiltration import is_honeypot, handle_honeypot_access, record_file_read
 from db import log_threat_event
 from config import QUARANTINE_DIR, THREAT_SCORE_THRESHOLD
 
@@ -72,6 +73,23 @@ class SentinelHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory:
             _push_event(f"File created: {event.src_path}")
+            # Check if a honeypot was accessed (created = opened for write by attacker)
+            if is_honeypot(event.src_path):
+                handle_honeypot_access(event.src_path)
+                _push_event(f"HONEYPOT HIT: {event.src_path}")
+                _update_status()
+
+    def on_opened(self, event):
+        """Detect file reads for exfiltration detection."""
+        if event.is_directory:
+            return
+        path = event.src_path
+        if is_honeypot(path):
+            handle_honeypot_access(path)
+            _push_event(f"HONEYPOT ACCESSED (read): {path}")
+            _update_status()
+        else:
+            record_file_read(path)
 
 def start_monitoring(paths: list):
     global _observer

@@ -17,6 +17,14 @@ from monitor import state, start_monitoring, stop_monitoring, reset_threat_score
 from simulator import run_simulation
 from employees import authenticate, is_known_email, get_all_employees
 from email_service import send_unauthorized_login, send_ransomware_alert, send_recovery_complete
+from engines.exfiltration import deploy_honeypots, exfil_state, reset_exfil_state, record_file_read, handle_honeypot_access
+from engines.integrity import register_quarantine, verify_integrity, get_manifest, remove_from_manifest
+from engines.prevention import (prevention_state, run_exfil_response, lock_sandbox, unlock_sandbox,
+                                 encrypt_sandbox, decrypt_sandbox, reset_prevention, kill_exfil_processes)
+from engines.url_scanner import scan_url
+
+# Track which files were accessed during exfiltration
+_exfil_accessed_files: set = set()
 
 app = FastAPI(title="SentinelShield AI", version="2.4.1-beta")
 
@@ -57,6 +65,7 @@ def startup():
                 f.write(content)
 
     deploy_canary(SANDBOX_DIR)
+    deploy_honeypots(SANDBOX_DIR)
     start_monitoring([SANDBOX_DIR])
     create_snapshot(SANDBOX_DIR)
     print("[SentinelShield] Backend ready.")
@@ -118,6 +127,14 @@ def get_status():
         "canary_intact": canary_intact,
         "monitored_paths": state["monitored_paths"],
         "recent_events": state["recent_events"][:20],
+        "exfiltration": {
+            "honeypot_hit":  exfil_state["honeypot_hit"],
+            "honeypot_file": exfil_state["honeypot_file"],
+            "read_anomaly":  exfil_state["read_anomaly"],
+            "read_count":    exfil_state["read_count"],
+            "score":         exfil_state["score"],
+            "events":        exfil_state["events"][:5],
+        },
     }
 
 # ── Threat Events ─────────────────────────────────────────────────────────────
@@ -246,6 +263,104 @@ def reset():
 
 # ── System Hardening Info (Layer 2) ──────────────────────────────────────────
 
+@app.get("/exfiltration/status")
+def exfiltration_status():
+    return {
+        "honeypot_hit":  exfil_state["honeypot_hit"],
+        "honeypot_file": exfil_state["honeypot_file"],
+        "read_anomaly":  exfil_state["read_anomaly"],
+        "read_count":    exfil_state["read_count"],
+        "score":         exfil_state["score"],
+        "events":        exfil_state["events"][:20],
+        "accessed_files": list(_exfil_accessed_files),
+    }
+
+@app.post("/simulate-exfiltration")
+def simulate_exfiltration():
+    """
+    Simulate an attacker silently copying files without modifying them.
+    Reads sandbox files rapidly + touches a honeypot file.
+    """
+    import threading, time
+
+    def _exfil():
+        files = [f for f in os.listdir(SANDBOX_DIR)
+                 if os.path.isfile(os.path.join(SANDBOX_DIR, f))
+                 and not f.startswith("_honeypot")]
+
+        # Step 1: Rapidly read normal files (volume anomaly)
+        for fname in files[:6]:
+            fpath = os.path.join(SANDBOX_DIR, fname)
+            try:
+                with open(fpath, "rb") as f:
+                    _ = f.read()
+                record_file_read(fpath)
+                _exfil_accessed_files.add(fname)
+                exfil_state["events"].insert(0, f"File read (copied): {fname}")
+                time.sleep(0.3)
+            except Exception:
+                pass
+
+        # Step 2: Access honeypot — this is what catches the attacker
+        time.sleep(0.5)
+        honeypot_path = os.path.join(SANDBOX_DIR, "_honeypot_passwords.txt")
+        if os.path.exists(honeypot_path):
+            with open(honeypot_path, "rb") as f:
+                _ = f.read()
+            handle_honeypot_access(honeypot_path)
+            _exfil_accessed_files.add("_honeypot_passwords.txt")
+
+        log_threat_event("exfiltration_simulated", exfil_state["score"],
+                         list(_exfil_accessed_files), "attacker_copied_files_detected")
+
+    threading.Thread(target=_exfil, daemon=True).start()
+    return {"status": "exfiltration_simulation_started", "sandbox": SANDBOX_DIR}
+
+@app.post("/exfiltration/reset")
+def reset_exfiltration():
+    reset_exfil_state()
+    _exfil_accessed_files.clear()
+    return {"reset": True}
+
+# ── Prevention endpoints ──────────────────────────────────────────────────────
+
+@app.get("/prevention/status")
+def prevention_status():
+    return prevention_state
+
+@app.post("/prevention/respond")
+def prevention_respond():
+    """Full automated response: lock folder + kill processes."""
+    result = run_exfil_response()
+    return {"status": "response_executed", **result}
+
+@app.post("/prevention/lock")
+def prevention_lock():
+    locked = lock_sandbox()
+    return {"locked": True, "files": locked}
+
+@app.post("/prevention/unlock")
+def prevention_unlock():
+    unlock_sandbox()
+    return {"unlocked": True}
+
+@app.post("/prevention/encrypt")
+def prevention_encrypt():
+    """Encrypt all sandbox files at rest with AES."""
+    encrypted = encrypt_sandbox()
+    return {"encrypted": encrypted, "count": len(encrypted)}
+
+@app.post("/prevention/decrypt")
+def prevention_decrypt():
+    """Decrypt all .enc files back to readable."""
+    decrypted = decrypt_sandbox()
+    return {"decrypted": decrypted, "count": len(decrypted)}
+
+@app.post("/prevention/reset")
+def prevention_reset():
+    reset_prevention()
+    return {"reset": True}
+
 @app.get("/system-hardening")
 def system_hardening():
     import datetime
@@ -255,6 +370,35 @@ def system_hardening():
         "email_filtering": "protected",
         "firewall": "enabled",
     }
+
+# ── URL Scanner ───────────────────────────────────────────────────────────────
+
+class URLScanRequest(BaseModel):
+    url: str
+    scanned_by: Optional[str] = "user"
+
+@app.post("/scan-url")
+def scan_url_endpoint(req: URLScanRequest):
+    result = scan_url(req.url, req.scanned_by)
+    # Send alert email if malicious
+    if result["verdict"] == "MALICIOUS":
+        from email_service import _send, _base, _row
+        body = f"""
+        <div style="background:#c0392b18;border:1px solid #c0392b40;border-radius:10px;padding:16px;margin-bottom:20px">
+          <p style="color:#c0392b;font-weight:700;margin:0 0 4px">⚠ Malicious URL Detected</p>
+          <p style="color:#8ba0b8;font-size:13px;margin:0">An employee scanned a dangerous link.</p>
+        </div>
+        {_row("URL", req.url, "#c0392b")}
+        {_row("Risk Score", f"{result['risk_score']}/100", "#c0392b")}
+        {_row("Scanned By", req.scanned_by)}
+        <div style="margin-top:16px">
+          <p style="color:#4a6080;font-size:12px;margin:0 0 8px">Reasons flagged:</p>
+          {"".join(f'<div style="padding:6px 10px;background:#c0392b10;border-left:3px solid #c0392b;margin:4px 0;border-radius:4px"><span style="color:#c0392b;font-size:12px">{r}</span></div>' for r in result["reasons"])}
+        </div>"""
+        html = _base("Malicious URL Scanned by Employee", "#c0392b", body)
+        from email_service import ADMIN_EMAIL
+        _send([ADMIN_EMAIL], f"🚨 [SentinelShield] Malicious URL Detected — {result['domain']}", html)
+    return result
 
 # ── List sandbox files ────────────────────────────────────────────────────────
 
@@ -443,15 +587,15 @@ def attack_detail():
 
 @app.post("/quarantine-attacked")
 def quarantine_attacked():
-    """Move all .locked files from sandbox to quarantine in one shot."""
     from engines.backup import quarantine_file
     moved = []
     for fname in os.listdir(SANDBOX_DIR):
         if fname.endswith(".locked"):
             fpath = os.path.join(SANDBOX_DIR, fname)
             quarantine_file(fpath)
+            register_quarantine(fname)
             moved.append(fname)
-    log_threat_event("bulk_quarantine", 0, moved, f"quarantined {len(moved)} attacked files")
+    log_threat_event("bulk_quarantine", 0, moved, f"quarantined {len(moved)} attacked files with integrity hashes")
     return {"quarantined": moved, "count": len(moved)}
 
 # ── Quarantine a specific file ────────────────────────────────────────────────
@@ -463,26 +607,53 @@ def quarantine_file_endpoint(filename: str):
     if not os.path.exists(fpath):
         raise HTTPException(404, "File not found in sandbox")
     dest = quarantine_file(fpath)
-    return {"quarantined": filename, "moved_to": dest}
+    record = register_quarantine(filename)
+    return {"quarantined": filename, "moved_to": dest, "sha256": record.get("sha256", "")[:16] + "..."}
 
-# ── Delete quarantine file ────────────────────────────────────────────────────
+# ── Delete quarantine file (integrity-verified) ───────────────────────────────
 
 @app.delete("/quarantine/{filename}")
 def delete_quarantine_file(filename: str):
+    check = verify_integrity(filename)
+    if check.get("tampered"):
+        raise HTTPException(403, f"Delete blocked — file tampered: {check['details']}")
     fpath = os.path.join(QUARANTINE_DIR, filename)
     if os.path.exists(fpath):
+        try:
+            import stat as st
+            os.chmod(fpath, st.S_IWRITE | st.S_IREAD)
+        except Exception:
+            pass
         os.remove(fpath)
-        log_threat_event("file_deleted", 0, [filename], "permanently_deleted")
-    return {"deleted": filename}
+        remove_from_manifest(filename)
+        log_threat_event("file_deleted", 0, [filename], "permanently_deleted_integrity_verified")
+    return {"deleted": filename, "integrity_verified": check.get("ok", True)}
 
-# ── Restore quarantine file to sandbox ───────────────────────────────────────
+# ── Restore quarantine file (integrity-verified) ──────────────────────────────
 
 @app.post("/quarantine/{filename}/restore")
 def restore_quarantine_file(filename: str):
+    check = verify_integrity(filename)
+    if check.get("tampered"):
+        raise HTTPException(403, f"Restore blocked — file tampered: {check['details']}")
     src = os.path.join(QUARANTINE_DIR, filename)
     dst = os.path.join(SANDBOX_DIR, filename)
     if not os.path.exists(src):
         raise HTTPException(404, "File not found in quarantine")
+    try:
+        import stat as st
+        os.chmod(src, st.S_IWRITE | st.S_IREAD)
+    except Exception:
+        pass
     shutil.move(src, dst)
-    log_threat_event("file_restored_from_quarantine", 0, [filename], "moved_back_to_sandbox")
-    return {"restored": filename, "to": dst}
+    remove_from_manifest(filename)
+    log_threat_event("file_restored_from_quarantine", 0, [filename], "restored_integrity_verified")
+    return {"restored": filename, "to": dst, "integrity_verified": check.get("ok", True)}
+
+# ── Quarantine integrity status ───────────────────────────────────────────────
+
+@app.get("/quarantine/integrity")
+def quarantine_integrity_status():
+    files = list_quarantine()
+    results = {f: verify_integrity(f) for f in files}
+    return {"files": results, "manifest": get_manifest()}

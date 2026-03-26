@@ -1,0 +1,40 @@
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min
+Full backup: Sunday 02:00
+Incremental: Daily 02:00
+RTO: 4 hours
+RPO: 30 min

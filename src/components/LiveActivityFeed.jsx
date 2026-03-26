@@ -14,20 +14,20 @@ const DUMMY = [
   { id: 7, timestamp: new Date(now -  10000).toISOString(), event_type: 'containment_complete', action_taken: 'threat_score_reset',               threat_score: 0   },
 ]
 
-function rowColor(type, score) {
-  if (type?.includes('canary') || score >= 70) return { text: '#FF3B3B', bg: 'rgba(255,59,59,0.05)', border: 'rgba(255,59,59,0.15)' }
-  if (score >= 30 || type?.includes('entropy') || type?.includes('rapid')) return { text: '#F2C94C', bg: 'rgba(242,201,76,0.05)', border: 'rgba(242,201,76,0.15)' }
-  return { text: '#4a6080', bg: 'transparent', border: 'transparent' }
+function rowStyle(type, score) {
+  if (type?.includes('canary') || score >= 70)
+    return { text: '#c0392b', bg: '#fde8e6', border: '#f5c6c2' }
+  if (score >= 30 || type?.includes('entropy') || type?.includes('rapid'))
+    return { text: '#b7770d', bg: '#fef3cd', border: '#fde68a' }
+  return { text: '#3d3020', bg: 'transparent', border: 'transparent' }
 }
 
 function fmt(ts) {
   if (!ts) return '--:--:--'
-  // Already a valid ISO or date string
   const d = new Date(ts)
   if (!isNaN(d.getTime())) {
     return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
   }
-  // Fallback: return as-is if it looks like HH:MM:SS
   return ts
 }
 
@@ -45,25 +45,25 @@ export default function LiveActivityFeed() {
   }, [])
 
   return (
-    <div className="glass rounded-xl p-5 flex flex-col h-full">
+    <div className="rounded-xl p-5 flex flex-col h-full" style={{ background: '#FFFFFF', border: '1px solid #D1BFA2' }}>
       <div className="flex items-center gap-2 mb-3">
-        <Terminal size={14} className="text-[#00FFB2]" />
-        <p className="text-xs font-semibold tracking-widest text-[#4a6080] uppercase">Live File Activity</p>
-        <span className="ml-auto flex items-center gap-1 text-xs text-[#00FFB2]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00FFB2] animate-pulse" /> LIVE
+        <Terminal size={14} style={{ color: '#2d6a4f' }} />
+        <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#6b5a45' }}>Live File Activity</p>
+        <span className="ml-auto flex items-center gap-1 text-xs" style={{ color: '#2d6a4f' }}>
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#2d6a4f' }} /> LIVE
         </span>
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-thin space-y-1 font-mono text-xs">
         {events.map((e, i) => {
-          const c = rowColor(e.event_type, e.threat_score)
+          const c = rowStyle(e.event_type, e.threat_score)
           return (
             <div
               key={e.id ?? i}
               className="flex items-start gap-3 px-3 py-2 rounded-lg transition-all"
               style={{ background: c.bg, border: `1px solid ${c.border}` }}
             >
-              <span className="text-[#2a3d55] shrink-0 w-16">{fmt(e.timestamp)}</span>
-              <span className="text-[#2F80ED] shrink-0 truncate max-w-[140px]">{e.event_type}</span>
+              <span className="shrink-0 w-16" style={{ color: '#6b5a45' }}>{fmt(e.timestamp)}</span>
+              <span className="shrink-0 truncate max-w-[140px]" style={{ color: '#C2A68D' }}>{e.event_type}</span>
               <span style={{ color: c.text }} className="truncate">{e.action_taken}</span>
               {e.threat_score > 0 && (
                 <span className="ml-auto shrink-0" style={{ color: c.text }}>+{e.threat_score}</span>
